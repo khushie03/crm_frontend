@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Page</title>
+    <style>
+        body {
+            background-color: #716e25; 
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column; /* Align elements vertically */
+        }
+        .upload-section {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 20px; /* Add margin to separate sections */
+            background-color: bisque;
+        }
+        #text-upload,
+        #image-upload {
+            cursor: pointer;
+        }
+        #text-box,
+        #file-input {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+        #file-name {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #333;
+        }
+        .submit-buttons {
+            display: flex;
+            justify-content: space-between; /* Align buttons horizontally */
+        }
+        .submit-buttons button {
+            width: 48%; /* Adjust width to fit horizontally */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="form" action="/recommend_products" method="post" enctype="multipart/form-data">
+            <div class="upload-section" id="text-section">
+                <p id="text-upload">Click here to upload text</p>
+                <img src="https://i.pinimg.com/originals/96/9c/07/969c074f0f59e7e8312995ada0250737.jpg" width="80" height="80" alt="Header Image">
+                <!-- Add a name attribute to the text area -->
+                <textarea id="text-box" name="typed_text" rows="4"></textarea>
+            </div>
+            <div class="upload-section" id="image-section">
+                <label for="file-input" id="image-upload">Click here to upload image</label>
+                <input id="file-input" type="file" accept="image/*" name="image" onchange="displayFileName(this)">
+                <span id="file-name"></span>
+                <img src="https://i.pinimg.com/originals/96/9c/07/969c074f0f59e7e8312995ada0250737.jpg" width="80" height="80" alt="Header Image">
+            </div>
+            <div class="submit-buttons">
+                <button type="submit" onclick="submitText()">Submit Text</button>
+                <button type="submit" onclick="submitImage()">Submit Image</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("text-upload").addEventListener("click", function() {
+            document.getElementById("text-box").style.display = "block";
+        });
+
+        document.getElementById("image-upload").addEventListener("click", function() {
+            document.getElementById("file-input").click();
+        });
+        function displayFileName(input) {
+            if (input.files.length > 0) {
+                document.getElementById("file-name").innerText = "Selected file: " + input.files[0].name;
+            } else {
+                document.getElementById("file-name").innerText = "";
+            }
+        }
+        function submitText() {
+            document.getElementById("form").action = "/context_text";
+        }
+        function submitImage() {
+            document.getElementById("form").action = "/image_similarity";
+        }
+    </script>
+</body>
+</html>

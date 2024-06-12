@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analytics</title>
+    <!-- Add any necessary CSS links here -->
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Adjust chart size */
+        #customerChart {
+            width: 60%; /* Reduce chart width */
+            height: auto; /* Maintain aspect ratio */
+            margin: auto;
+        }
+
+        /* Style for question and answer input */
+        #questionForm {
+            margin-top: 20px;
+        }
+
+        #question {
+            width: 80%; /* Adjust as needed */
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        #answer {
+            width: 90%; /* Increase answer box width */
+            height: 200px; /* Increase answer box height */
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            resize: none; /* Prevent resizing */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Section for Diagrammatical Representation of Customer Details -->
+    <section id="customer-details">
+        <h2>Diagrammatical Representation of Customer Details</h2>
+        <canvas id="customerChart"></canvas>
+    </section>
+
+    <!-- Section for Question Answering -->
+    <section id="question-answering">
+        <h2>Question Answering</h2>
+        <!-- Add your question and answer form here -->
+        <form id="questionForm">
+            <label for="question">Enter your question:</label>
+            <input type="text" id="question" name="question">
+            <button type="submit">Submit</button>
+        </form>
+        <textarea id="answer" rows="6" readonly></textarea>
+    </section>
+
+    <!-- Add any necessary JavaScript links here -->
+    <script>
+        // Wait for DOM content to be loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to send question to backend and receive response
+            function askQuestion(question) {
+                fetch('/answer_question', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            question: question
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('answer').value = data.answer;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('answer').value = 'An error occurred while fetching the answer.';
+                    });
+            }
+
+            // Sample customer data from Flask template
+            var customerData = {
+                labels: {{ customer_names | tojson }},
+                datasets: [{
+                        label: 'Number of Visits',
+                        data: {{ number_of_visits | tojson }},
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Spend Rate',
+                        data: {{ spend_rate | tojson }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            // Create the chart
+            var ctx = document.getElementById('customerChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: customerData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Handle form submission for question answering
+            document.getElementById('questionForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+                var formData = new FormData(event.target);
+                var question = formData.get('question');
+                askQuestion(question); // Call function to ask question
+            });
+        });
+    </script>
+
+</body>
+
+</html>
